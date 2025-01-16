@@ -1,0 +1,97 @@
+{% extends "basic.html" %}
+
+{% block title %}
+  IMetro
+{% endblock %}
+
+{% block main %}
+
+  <!-- 城市选择控件 -->
+  <div class="d-flex align-items-start ms-4" style="margin-top: -40px">
+    <div class="dropdown" style="z-index: 1000">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        {{constants.CHOOSE_CITY}}
+      </button>
+      <ul class="dropdown-menu">
+        {% for city in constants.CITIES %}
+          <li><a class="dropdown-item">{{city}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="d-grid">
+    <div style="z-index: 999;margin-top: 20px" class="d-flex align-items-start ms-4 gap-4">
+        <input type="text" id="start" class="form-control" style="width: 13%;" placeholder={{constants.HINT_START}}>
+    </div>
+    <div style="z-index: 999;margin-top: 20px" class="d-flex align-items-start ms-4 gap-4">
+        <input type="text" id="end" class="form-control" style="width: 13%;" placeholder={{constants.HINT_END}}>
+    </div>
+    <div style="z-index: 999;margin-top: 20px" class="d-flex align-items-start ms-4 gap-4">
+      <button type="button" class="btn btn-primary" style="width: 13%; white-space: nowrap; overflow: hidden;" onclick="checkLine()">{{constants.BTN_CHECK}}</button>
+    </div>
+  </div>
+
+  <div id="subway-container"></div>
+
+{% endblock %}
+
+{% block script %}
+
+  <script type="text/javascript">
+
+    var subway;
+
+    // 渲染地图对象
+    function render_subway_map(cityName) {
+      var list = BMapSub.SubwayCitiesList;
+      var subwaycity = null;
+      for (var i = 0; i < list.length; i++) {
+          if (list[i].name === cityName) {
+              subwaycity = list[i];
+              break;
+          }
+      }
+      subway = new BMapSub.Subway('subway-container', subwaycity.citycode);
+      var zoomControl  = new BMapSub.ZoomControl({
+          anchor: BMAPSUB_ANCHOR_BOTTOM_RIGHT,
+          offset: new BMapSub.Size(10,100)
+      });
+      subway.addControl(zoomControl);
+      subway.setZoom(1);
+
+      subway.addEventListener('tap', function(e) {
+        var detail = new BMapSub.DetailInfo(subway);
+        detail.search(e.station.name);
+      });
+    }
+
+    // 初始化
+    render_subway_map('南京');
+
+    // 获取所有菜单项
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+    // 为每个菜单项添加点击事件监听器
+    dropdownItems.forEach(item => {
+      item.addEventListener('click', function (event) {
+        // 获取点击菜单项的文字内容
+        var subwaycity = null;
+        var selectedCity = event.target.textContent;
+        render_subway_map(selectedCity);
+      });
+    });
+
+    function checkLine() {
+      // 获取输入框元素
+      const start = document.getElementById('start').value.trim();
+      const end = document.getElementById('end').value.trim();
+      if (subway && start !== "" && end !== "") {
+        var drct = new BMapSub.Direction(subway);
+        drct.search(start, end);
+      }
+    }
+
+  </script>
+
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends "basic.html" %}
+
+{% block title %}
+  IMap
+{% endblock %}
+
+{% block main %}
+
+  <!-- 导航栏 -->
+  <div class="d-grid">
+    <div id="keywordSearch" style="z-index: 999; margin-top: 80px" class="d-flex align-items-start ms-3" role="search">
+      <input class="form-control me-2" type="text" id="searchInput" size="20" placeholder="搜索" style="z-index: 999;">
+    </div>
+
+    <div style="z-index: 999; margin-top: 20px" class="d-flex flex-row align-items-start ms-3 gap-3">
+      <button type="button" class="btn btn-primary" style="width: 6%;" data-bs-toggle="modal" data-bs-target="#add" aria-controls="offcanvasWithBothOptions">{{constants.ADD_COORDINATES}}</button>
+      <button type="button" class="btn btn-primary" style="width: 6%;" data-bs-toggle="modal" data-bs-target="#view" aria-controls="offcanvasWithBothOptions">{{constants.VIEW_MARKERS}}</button>
+    </div>
+
+    <div class="form-check form-switch d-flex align-items-start ms-3 gap-3" style="z-index: 999; margin-top: 20px">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+      <label class="form-check-label" for="flexSwitchCheckChecked">{{constants.DIVISIONS}}</label>
+    </div>
+  </div>
+
+  <!-- 添加坐标模态框 -->
+  <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="add-coordinate-card">{{constants.ADD_COORDINATES}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- 模态框主体内容 -->
+        <div class="modal-body">
+          <div class="card">
+            <div class="card-body">
+              <form id="coordinateForm" action="/map" method="POST">
+                <div class="mb-3">
+                  <label for="lng" class="form-label">{{coordinateForm.lng.label}}</label>
+                  {{coordinateForm.lng(class="form-control")}}
+                </div>
+                <div class="mb-3">
+                  <label for="lat" class="form-label">{{coordinateForm.lat.label}}</label>
+                  {{coordinateForm.lat(class="form-control")}}
+                </div>
+                <div class="mb-3">
+                  <label for="address" class="form-label">{{coordinateForm.address.label}}</label>
+                  {{coordinateForm.address(class="form-control")}}
+                </div>
+                <div class="mb-3">
+                  <label for="tag" class="form-label">{{coordinateForm.tag.label}}</label>
+                  {{coordinateForm.tag(class="form-control")}}
+                </div>
+                {{coordinateForm.submit(class="btn btn-primary")}}
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 地点一览模态框 -->
+  <div class="modal fade" id="view" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="add-coordinate-card">{{constants.VIEW_MARKERS}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- 模态框主体内容 -->
+        <div class="modal-body" style="max-height: 600px; overflow-y: auto;">
+          <table class="table table-hover" style="table-layout: inherit; width: 100%;">
+            <tr>
+              <th style="width: 15%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.NUM}}</th>
+              <th style="width: 30%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.TAG}}</th>
+              <th style="width: 50%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.ADDRESS}}</th>
+              <th style="width: 20%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.LNG}}</th>
+              <th style="width: 20%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.LAT}}</th>
+              <th style="width: 50%; white-space: nowrap; text-align: center; vertical-align: middle;">{{constants.DELETE}}</th>
+            </tr>
+            {% for location in locations %}
+              <tr style="text-align: center; vertical-align: middle;">
+                <td>{{location.id}}</td>
+                <td>{{location.tag}}</td>
+                <td>{{location.address}}</td>
+                <td>{{location.lng}}</td>
+                <td>{{location.lat}}</td>
+                <td><a href="/map/delete/{{location.id}}"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                </svg></a></td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class = "info">
+      <div class="selbox">
+          <span>选择省份</span>
+          <select name="sel-list" id="prolist" onchange="changeProvince(this)">
+              <option value="-1">选择省份</option>
+          </select>
+      </div>
+      <div class="selbox">
+          <span>选择层级</span>
+          <select name="sel-list" onchange="changeDepth(this)">
+              <option value="0">省级行政区-0</option>
+              <option selected value="1">市级行政区-1</option>
+              <option value="2">区/县级行政区-2</option>
+          </select>
+      </div>
+  </div>
+
+  <!-- 地图 -->
+  <div id="l-map"></div> 
+
+  {% block script %}
+    <script>
+
+      function G(id) {
+        return document.getElementById(id);
+      }
+
+      // 全局变量记录插入的jsonp标签
+      window.clickPoint = null;
+      window.script = null;
+      window.sucess = function(res) {		
+          console.log(res);
+          if (res.uii_err === 0 && res.content) {
+              var info = res.content;
+              var sContent = `<h4 style='margin:0 0 5px 10px;'>${info.name}</h4>
+                  <h5 style='margin:0 0 5px 10px;'>地址：${info.addr}</h4>
+                  <h5 style='margin:0 0 35px 10px;'>分类：${info.tag !== '境外区域' || info.tag === info.name? info.tag : '地址'}</h4>`;
+              var infoWindow = new BMapGL.InfoWindow(sContent);  // 创建信息窗口对象 
+              map.openInfoWindow(infoWindow, clickPoint); //开启信息窗口
+              // 移除插入的标签，防止越插入越多
+              document.getElementsByTagName('head')[0].removeChild(script);
+          }
+      }
+
+      // 创建地图
+      var map = new BMapGL.Map("l-map", {enableIconClick: true});
+      var point = new BMapGL.Point(104.747198,34.278766);
+      map.centerAndZoom(point, 12); 
+
+      // 添加自定义地图样式
+      map.setMapStyleV2({     
+        styleId: '9875bd0803e91fcaa1e80f41386813c4'
+      });
+
+      //开启鼠标滚轮缩放
+      map.enableScrollWheelZoom(true);
+
+      // 控件
+      var scaleCtrl = new BMapGL.ScaleControl(); // 比例尺控件
+      var zoomCtrl = new BMapGL.ZoomControl(); // 缩放控件
+      var navi3DCtrl = new BMapGL.NavigationControl3D({ // 3D控件
+          offset: new BMapGL.Size(40, 110)
+      });
+      var locationControl = new BMapGL.LocationControl({ // 定位控件
+          anchor: BMAP_ANCHOR_TOP_RIGHT,
+          offset: new BMapGL.Size(45, 40)
+      });
+
+      // 将控件添加到地图上
+      map.addControl(scaleCtrl);
+      map.addControl(zoomCtrl);
+      map.addControl(navi3DCtrl);
+      map.addControl(locationControl);
+
+      map.addEventListener('click', e => {
+          clickPoint = e.latlng;
+          const point = e.point;
+          const itemId = map.getIconByClickPosition(e);
+          if (itemId) {
+            let url = "//api.map.baidu.com/?qt=inf&uid="+itemId.uid+'&operate=mapclick&clicktype=tile&ie=utf-8&oue=1&fromproduct=jsapi&res=api&&ak={{constants.API_KEY}}&callback=sucess'
+              script = document.createElement('script');
+              script.setAttribute('src', url);
+              document.getElementsByTagName('head')[0].appendChild(script); 
+          }
+      });
+
+      map.addEventListener('rightclick', e => {
+        // 获取点击位置的经纬度
+        const lng = e.latlng.lng;
+        const lat = e.latlng.lat;
+
+        // 设置模态框中的输入框值
+        document.querySelector('#lng').value = lng;
+        document.querySelector('#lat').value = lat;
+
+        // 打开模态框
+        const modal = new bootstrap.Modal(G('add'));
+        modal.show();
+      });
+
+      var proname = '江苏省';
+      var prokind = 1;
+      var dist = null;
+
+      // --- 添加行政区 ---
+      function addDis(proname, prokind) {
+          map.removeDistrictLayer(dist);
+          dist = new BMapGL.DistrictLayer({
+              name: '(' + proname + ')',
+              kind: prokind,
+              fillColor: '#618bf8',
+              strokeColor: '#daeafa',
+              viewport: true
+          });
+          map.addDistrictLayer(dist);
+      }
+      addDis(proname, prokind);
+
+      // --- 切换行政区与层级 ---
+      function changeProvince(ele) {
+          proname = ele.value;
+          addDis(ele.value, prokind);
+      }
+
+      function changeDepth(ele) {
+          prokind = ele.value;
+          addDis(proname, ele.value);
+      }
+
+      // --- 行政区划添加鼠标事件 ---
+      dist.addEventListener('mouseover', function (e) {
+          e.currentTarget.setFillColor('#9169db');
+      });
+      dist.addEventListener('mouseout', function (e) {
+          e.currentTarget.setFillColor(e.currentTarget.style.fillColor);
+      });
+
+      // 获取 checkbox 元素
+      const checkbox = G('flexSwitchCheckChecked');
+      // 监听 checkbox 的变化
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+          map.addDistrictLayer(dist);
+        } else {
+          removeLabels()
+        }
+      });
+
+      function removeLabels() {
+        map.removeDistrictLayer(dist);
+      }
+
+      // 坐标
+      {% for location in locations %}
+        var lng = {{ location.lng }};
+        var lat = {{ location.lat }};
+        var address = "{{ location.address }}";
+        var tag = "{{ location.tag }}";
+
+        var point = new BMapGL.Point(lng, lat);
+        var marker = new BMapGL.Marker(point);
+        map.addOverlay(marker);
+
+        // 信息窗口
+        var opts = {
+            width: 200,
+            height: 100,
+            title: tag
+        };
+
+        // 使用闭包确保每个标记的点击事件都有自己的信息
+        (function(marker, point, address, lng, lat) {
+            var infoWindow = new BMapGL.InfoWindow('{{constants.ADDRESS}}：' + address + '<br/>{{constants.LNG}}：' + lng + '<br/>{{constants.LAT}}：' + lat, opts);
+            marker.addEventListener('click', function () {
+                map.openInfoWindow(infoWindow, point);
+            });
+        })(marker, point, address, lng, lat);
+      {% endfor %}
+
+      // 检索服务 
+      // 获取输入框元素
+      const searchInput = G('searchInput');
+      // 为输入框添加回车键事件监听
+      searchInput.addEventListener('keydown', function(event) {
+        // 判断是否按下回车键
+        if (event.key === 'Enter') {
+          // 获取输入框中的内容
+          const searchText = searchInput.value;
+          var local = new BMapGL.LocalSearch(map, {
+            renderOptions:{map: map, autoViewport: true}
+          });
+          // BUG: 容易出现无法检索到的错误情况
+          local.search(searchText);
+        }
+      });
+
+      var optarr = provinces.map(function (item) {
+        return '<option ' + (item.name === proname ? 'selected' : '') + ' value="' + item.name + '">' + item.name + '</option>';
+      });
+      G('prolist').innerHTML = optarr.join('');
+    </script>
+
+  {% endblock %}
+
+{% endblock %}
