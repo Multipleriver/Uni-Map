@@ -1,17 +1,19 @@
-# 并不严肃的 README 太太太他妈肝了！！！
+# 答辩讲稿 --并不严肃的 README--太太太他妈肝了！！
+
+<代码熟练度还是不够，很多问题都得现学>
 
 ## 创新点
 
-### `Flask` 框架
+### 1. `Flask` 框架
 
 - 足够轻量级的 Web 框架，适用于简单项目快速落地。
 - 使用 `Python` 语言开发
-### `Blueprint` 结构
+### 2. `Blueprint` 结构
 
 - 蓝图功能支持`map`和`metro`两个模块。
 - 高扩展、低耦合：`app`文件夹下新建子文件夹，注入项目即可加入功能，不需要考虑其他模块功能的冲突。
 
-### `Bootstrapt` UI 组件
+### 3. `Bootstrapt` UI 组件
 
 - UI 组件模块化，方便管理和调用
 - 快捷的 CDN 链接导入形式
@@ -19,22 +21,21 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 ```
-### `basic` 统一管理
-占位符操作，
+### 4. `basic` 统一管理
 
-模板语法提高代码复用性
+- 占位符操作，模板语法提高代码复用性
 
-### `constants.py`
+### 5. `constants.py`
 
 - 常量的统一集中宏定义
 - 便于集中替换 `API_KEY`、`FOOTER` 等常量
 
-### `SQLAlchemy` 数据库操作和 `SOLite` 数据库
+### 6. `SQLAlchemy` 数据库操作和 `SOLite` 数据库
 
 - 轻量化数据库配置
 - 迁移工具：表结构变更（e.g. 要加字段，可以快速迁移，也可以回退版本）
 
-### `Jinja2` 模板引擎
+### 7. `Jinja2` 模板引擎
 
 - locations变量的传参，循环遍历数据库，把每一个都创建出来.
 
@@ -60,30 +61,52 @@
 
 ## 已解决的典型问题
 
-代码数量熟练度不够
 
-前后通讯的问题
+### 1. 前后通讯的问题
 
-使用闭包？点击事件的覆盖，要保证每一个点击事件都能
+通过 `GET` 和 `POST` 信号量来分支前端的请求
 
-### z-index: 999
+### 2. 多个左键点击事件冲突
 
-### 多个监听事件冲突
+我查阅了百度地图 api 的类参考文档，想要通过在左键点击事件里通过 if else 条件分支区分左键点击事件不同的行为，但是在官方 api 文档里没找到合适的类和方法，就改用右键点击事件添加任意点坐标，这样相比于左键不容易误触。
 
-优先级设置
-阻值向后传播
+使用闭包？
+```jinja2
+// map.html
+// 使用闭包确保每个标记的点击事件都有自己的信息
+(function(marker, point, address, lng, lat) {
+    var infoWindow = new BMapGL.InfoWindow('{{constants.ADDRESS}}：' + address + '<br/>{{constants.LNG}}：' + lng + '<br/>{{constants.LAT}}：' + lat, opts);
+    marker.addEventListener('click', function () {
+        map.openInfoWindow(infoWindow, point);
+    });
+})(marker, point, address, lng, lat);
+{% endfor %}
+```
 
+
+### 3. 图层覆盖
+
+以导航栏为例，通过引入代码：
+
+```html
+style="z-index: 999;
+```
+
+来设置图层的优先级
+
+```html
+<!-- map.html -->
+<div id="keywordSearch" style="z-index: 999; margin-top: 80px" class="d-flex align-items-start ms-3" role="search">
+```
 
 ## 后续改进
 
-行政区划的开关
+### 1. 行政区划的开关
 
-WTF的工具：用python代码validate验证表单
-
+### 2. WTF的工具：用python代码validate验证表单
 
 
 ## 工具解析
-
 
 ### 1. **Flask 框架**
 Flask 是一个轻量级的 Python Web 框架，它非常适合小型到中型的 Web 应用。Flask 提供了路由、请求处理、模板渲染等基本功能，可以让开发者专注于业务逻辑而无需处理复杂的配置。
